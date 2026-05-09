@@ -1,0 +1,23 @@
+.env
+mcp*.json
+
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv/
+
+# Log files
+*.log
+
+# Test coverage
+htmlcov/
+.coverage
+
+# VSCode settings
+.vscode/PythonImportHelper-v2-Completion.json

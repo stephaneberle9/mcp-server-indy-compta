@@ -1,0 +1,103 @@
+[project]
+name = "mcp-server-indy-compta"
+dynamic = ["version"]
+description = "MCP server exposing Indy.fr accounting platform data"
+authors = [
+    { name = "Stephan Eberle", email = "stephaneberle9@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "fastmcp>=3.0.0,<4",
+    "fastmcp-creds[keyring]",
+    "indy-compta[browser-login]",
+]
+
+[dependency-groups]
+dev = [
+    "ty",
+    "pre-commit>=4.3.0",
+    "ruff",
+]
+test = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.10.0",
+]
+
+[project.scripts]
+mcp-server-indy-compta = "mcp_server_indy_compta.__main__:main"
+
+[build-system]
+requires = ["hatchling", "uv-dynamic-versioning"]
+build-backend = "hatchling.build"
+
+[tool.uv-dynamic-versioning]
+enable = true
+vcs = "git"
+style = "pep440"
+
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
+
+[tool.hatch.build.targets.wheel]
+sources = ["src"]
+exclude = [
+  "*.log"
+]
+
+[tool.hatch.build.targets.sdist]
+sources = ["src"]
+exclude = [
+  "*.log"
+]
+
+[tool.uv]
+default-groups = ["dev", "test"]
+
+[tool.uv.sources]
+fastmcp-creds = { path = "../fastmcp-creds", editable = true }
+indy-compta = { path = "../python-indy-compta", editable = true }
+
+[tool.deptry]
+exclude = [
+  "*.log",
+  ".venv/",
+]
+
+[tool.ruff.lint]
+extend-select = ["I", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "I001", "RUF013"]
+"src/mcp_server_indy_compta/__init__.py" = ["E402"]
+
+[tool.codespell]
+skip = "*.lock,pyproject.toml,*PythonImportHelper*"
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+pythonpath = ["src"]
+asyncio_mode = "auto"
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+    "--cov=mcp_server_indy_compta",
+    "--cov-report=term-missing",
+]
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["tests/*", "**/__pycache__/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
