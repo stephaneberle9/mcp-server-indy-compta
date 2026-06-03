@@ -53,7 +53,7 @@ Run the server:
 uv run --env-file .env mcp-server-indy-compta
 ```
 
-On the first tool call, if `INDY_TOKEN` is not set, a Chrome window opens automatically and waits for you to log in to Indy.fr. The token is then captured and cached for subsequent runs.
+On the first tool call, if `INDY_TOKEN` is not set, a browser window opens automatically and waits for you to log in to Indy.fr. The token is then captured and cached for subsequent runs. The browser defaults to Google Chrome; set `INDY_BROWSER` to use Edge or Chromium instead.
 
 ### Configuration
 
@@ -61,7 +61,8 @@ Credentials are provided via environment variables (copy `.env.example` to `.env
 
 | Variable | Description |
 | -------- | ----------- |
-| `INDY_TOKEN` | Optional Indy.fr HS512 JWT. If unset, browser-based auth is used on the first tool call (Google Chrome required). See `.env.example` for capture instructions. |
+| `INDY_TOKEN` | Optional Indy.fr HS512 JWT. If unset, browser-based auth is used on the first tool call (a supported browser must be installed — see `INDY_BROWSER`). See `.env.example` for capture instructions. |
+| `INDY_BROWSER` | Browser the login flow drives when `INDY_TOKEN` is unset: `chrome` (default), `edge`, or `chromium`. The flow reuses the browser's existing profile, so the chosen browser must be installed. Use `edge` when Chrome isn't available — Edge ships with Windows. |
 | `INDY_TOKEN_CACHE_PATH` | Override the token cache file location (default: `~/.cache/mcp-server-indy-compta/token.json`). |
 | `INDY_COMPTA_DEBUG` | Set to `true` or `1` to enable debug logging (equivalent to `--debug` flag). |
 
@@ -69,7 +70,7 @@ Two authentication modes are supported:
 
 | Mode | How it works |
 | ---- | ------------ |
-| **Browser auth** | Leave `INDY_TOKEN` unset. On the first tool call, a Chrome window opens, you complete the Indy.fr login, and the token is cached at `~/.cache/mcp-server-indy-compta/token.json`. Subsequent starts reuse the cached token; the browser only reopens on 401. |
+| **Browser auth** | Leave `INDY_TOKEN` unset. On the first tool call, a browser window opens (Chrome by default; override with `INDY_BROWSER`), you complete the Indy.fr login, and the token is cached at `~/.cache/mcp-server-indy-compta/token.json`. Subsequent starts reuse the cached token; the browser only reopens on 401. |
 | **Static token** | Set `INDY_TOKEN` in `.env` to a JWT captured from your browser's DevTools (see `.env.example` for instructions). No browser required at runtime. |
 
 Override the token cache location with `INDY_TOKEN_CACHE_PATH`.
@@ -239,7 +240,7 @@ Or go to `Settings > Developer`, select `indy-compta` and click `Open Logs Folde
 
 **Browser does not open for authentication**
 
-Ensure Google Chrome is installed. The browser-based auth flow requires Chrome (via Playwright). If it still fails, capture a token manually and set `INDY_TOKEN` in your `.env` file (see `.env.example` for instructions).
+Ensure the selected browser is installed. The browser-based auth flow drives Google Chrome by default (via Playwright); set `INDY_BROWSER=edge` to use the Edge browser that ships with Windows, or `INDY_BROWSER=chromium` for a bundled Chromium fallback (which may be blocked by Cloudflare). If it still fails, capture a token manually and set `INDY_TOKEN` in your `.env` file (see `.env.example` for instructions).
 
 **Token expires and tools stop working**
 
