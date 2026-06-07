@@ -34,14 +34,16 @@ class IndyClientProvider:
 
     def __init__(self):
         self._client: IndyClient | None = None
-        self._credentials = CredentialsProviderChain([
-            # 1. OS keyring  (keyring set indy-compta token <jwt>)
-            KeyringCredentialsProvider.for_token(self.INDY_KEYRING_SERVICE),
-            # 2. Custom MCP client header
-            CustomHeaderCredentialsProvider.for_token(self.INDY_TOKEN_HEADER_NAME),
-            # 3. Environment variable
-            EnvironmentCredentialsProvider.for_token(self.INDY_TOKEN_ENV_VAR_NAME),
-        ])
+        self._credentials = CredentialsProviderChain(
+            [
+                # 1. OS keyring  (keyring set indy-compta token <jwt>)
+                KeyringCredentialsProvider.for_token(self.INDY_KEYRING_SERVICE),
+                # 2. Custom MCP client header
+                CustomHeaderCredentialsProvider.for_token(self.INDY_TOKEN_HEADER_NAME),
+                # 3. Environment variable
+                EnvironmentCredentialsProvider.for_token(self.INDY_TOKEN_ENV_VAR_NAME),
+            ]
+        )
 
     @classmethod
     def _resolve_browser(cls) -> Browser:

@@ -34,7 +34,12 @@ def cli():
     args = parser.parse_args()
 
     if not args.debug:
-        args.debug = os.getenv("INDY_COMPTA_DEBUG", "").lower() in ("1", "true", "yes", "on")
+        args.debug = os.getenv("INDY_COMPTA_DEBUG", "").lower() in (
+            "1",
+            "true",
+            "yes",
+            "on",
+        )
 
     return args
 
@@ -82,7 +87,9 @@ def main():
 
     try:
         if args.port:
-            mcp.run(transport="http", port=args.port, log_level=get_log_level_name(args))
+            mcp.run(
+                transport="http", port=args.port, log_level=get_log_level_name(args)
+            )
         else:
             mcp.run(transport="stdio", log_level=get_log_level_name(args))
     except KeyboardInterrupt:
