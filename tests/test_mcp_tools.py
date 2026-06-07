@@ -3,6 +3,7 @@
 from unittest.mock import AsyncMock
 
 import pytest
+from indy_compta.client import IndyClient
 
 from mcp_server_indy_compta.mcp_server import (
     create_invoice_draft,
@@ -24,7 +25,7 @@ from mcp_server_indy_compta.mcp_server import (
 
 @pytest.fixture
 def mock_client(mocker):
-    client = AsyncMock()
+    client = AsyncMock(spec=IndyClient)
     mocker.patch("mcp_server_indy_compta.mcp_server._client", return_value=client)
     return client
 
@@ -193,8 +194,6 @@ CLIENT_METHODS = [
 
 @pytest.mark.parametrize("method_name", CLIENT_METHODS)
 def test_indy_client_exposes_method(method_name):
-    from indy_compta.client import IndyClient
-
     assert callable(getattr(IndyClient, method_name, None)), (
         f"IndyClient is missing method '{method_name}' that an MCP tool depends on"
     )
@@ -212,8 +211,6 @@ def test_no_unwrapped_client_methods():
     removals; this one catches new API methods landing in the lib without a tool.
     """
     import inspect
-
-    from indy_compta.client import IndyClient
 
     public = {
         name
