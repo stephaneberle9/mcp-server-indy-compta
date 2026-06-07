@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 from typing import Any
 
 from fastmcp import FastMCP
@@ -12,6 +13,30 @@ mcp = FastMCP("Indy.fr Accounting")
 
 _provider = IndyClientProvider()
 
+# Receipt uploads egress file bytes to Indy, and the path is model-controlled, so
+# constrain what upload_receipt will read: real receipt formats only, under a sane
+# size cap. This stops a prompt-injected model from shipping arbitrary local files
+# (keys, credentials) before the bytes leave the machine.
+_ALLOWED_RECEIPT_SUFFIXES = frozenset({".pdf", ".png", ".jpg", ".jpeg", ".heic"})
+_MAX_RECEIPT_BYTES = 25 * 1024 * 1024  # 25 MB
+
+
+def _validated_receipt_path(file_path: str) -> Path:
+    path = Path(file_path).expanduser().resolve(strict=True)
+    if not path.is_file():
+        raise ValueError(f"Not a regular file: {file_path}")
+    if path.suffix.lower() not in _ALLOWED_RECEIPT_SUFFIXES:
+        allowed = ", ".join(sorted(_ALLOWED_RECEIPT_SUFFIXES))
+        raise ValueError(
+            f"Unsupported receipt file type '{path.suffix}'. Allowed: {allowed}."
+        )
+    size = path.stat().st_size
+    if size > _MAX_RECEIPT_BYTES:
+        raise ValueError(
+            f"Receipt file is {size} bytes, exceeds the {_MAX_RECEIPT_BYTES}-byte limit."
+        )
+    return path
+
 
 def _client():
     """Return the singleton IndyClient. Browser auth is deferred until the first API call."""
@@ -21,6 +46,7 @@ def _client():
 # ---------------------------------------------------------------------------
 # Transactions
 # ---------------------------------------------------------------------------
+
 
 @mcp.tool(
     name="get_transaction_filters",
@@ -103,9 +129,67 @@ async def get_receipts_for_transaction(transaction_id: str) -> dict[str, Any]:
     return await _client().get_receipts_for_transaction(transaction_id)
 
 
+@mcp.tool(
+    name="upload_receipt",
+    description=(
+        "Upload a receipt or expense document (PDF or image) from disk and attach it to a "
+        "transaction. Note: only receipts can be uploaded — invoices are created with "
+        "create_invoice_draft, not uploaded. "
+        "Parameters: transaction_id (target transaction), file_path (path to the document on "
+        "this machine), filename (optional override for the name sent to Indy), "
+        "content_type (optional MIME type; inferred from the extension when omitted). "
+        "Indy runs OCR on the upload and returns the new receipt with extracted fields "
+        "(description, amount, date) under 'receiptData'."
+    ),
+)
+async def upload_receipt(
+    transaction_id: str,
+    file_path: str,
+    filename: str | None = None,
+    content_type: str | None = None,
+) -> dict[str, Any]:
+    path = _validated_receipt_path(file_path)
+    return await _client().upload_receipt(
+        transaction_id,
+        path,
+        filename=filename,
+        content_type=content_type,
+    )
+
+
+@mcp.tool(
+    name="find_matching_receipts",
+    description=(
+        "Find already-uploaded but unattached receipts that could match the given transactions, "
+        "so they can be linked instead of re-uploaded. "
+        "Parameters: transaction_ids (list of transaction ids to find matches for). "
+        "Returns 'receipts' (candidate receipt objects) and 'transactions' (the transactions a "
+        "match was found for); both empty when nothing matches."
+    ),
+)
+async def find_matching_receipts(transaction_ids: list[str]) -> dict[str, Any]:
+    return await _client().find_matching_receipts(transaction_ids)
+
+
+@mcp.tool(
+    name="find_matching_invoices",
+    description=(
+        "Find finalized billing invoices that could match the given transactions, so an issued "
+        "invoice can be reconciled with an incoming payment. The sales counterpart to "
+        "find_matching_receipts. "
+        "Parameters: transaction_ids (list of transaction ids to find matches for). "
+        "Returns 'invoices' (candidate invoice objects) and 'transactions' (the transactions a "
+        "match was found for); both empty when nothing matches."
+    ),
+)
+async def find_matching_invoices(transaction_ids: list[str]) -> dict[str, Any]:
+    return await _client().find_matching_invoices(transaction_ids)
+
+
 # ---------------------------------------------------------------------------
 # Clients & products
 # ---------------------------------------------------------------------------
+
 
 @mcp.tool(
     name="get_client_suggestions",
@@ -140,6 +224,7 @@ async def list_products() -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 # Invoices
 # ---------------------------------------------------------------------------
+
 
 @mcp.tool(
     name="list_invoice_drafts",
@@ -210,6 +295,7 @@ async def create_invoice_draft(
 # Prompts
 # ---------------------------------------------------------------------------
 
+
 @mcp.prompt(
     name="monthly_expense_summary",
     description=(
@@ -254,7 +340,9 @@ def monthly_expense_summary(year: int, month: int) -> list[Message]:
         "Looks up the client by name and guides through building the invoice."
     ),
 )
-def create_invoice_workflow(client_name: str, service_description: str, amount_euros: float) -> list[Message]:
+def create_invoice_workflow(
+    client_name: str, service_description: str, amount_euros: float
+) -> list[Message]:
     """Prompt the assistant to create an invoice draft interactively.
 
     Args:
