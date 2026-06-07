@@ -1,0 +1,13 @@
+# Normalize line endings: store and check out text files as LF on every
+# platform. This overrides a local core.autocrlf=true, which otherwise rewrites
+# the working tree to CRLF and produces phantom EOL-only diffs whenever a
+# formatter (ruff, prettier) writes a file with LF.
+* text=auto eol=lf
+
+# Common binary types — never normalize, never diff as text.
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.pdf  binary
