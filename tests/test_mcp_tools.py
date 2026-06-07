@@ -73,6 +73,30 @@ async def test_get_receipts_for_transaction(mock_client):
     assert "receipts" in result
 
 
+async def test_get_receipts_for_transaction_returns_only_paired(mock_client):
+    # The Indy endpoint mixes the transaction's attached receipt (PAIRED) with
+    # the account-wide pool of unattached receipts (UNRELATED). The tool must
+    # return only the attached ones so an empty list reliably means "no receipt".
+    mock_client.get_receipts_for_transaction.return_value = {
+        "receipts": [
+            {"_id": "attached", "pairingStatus": "PAIRED"},
+            {"_id": "orphan-1", "pairingStatus": "UNRELATED"},
+            {"_id": "orphan-2", "pairingStatus": "UNRELATED"},
+        ]
+    }
+    result = await get_receipts_for_transaction("tx-123")
+    assert [r["_id"] for r in result["receipts"]] == ["attached"]
+
+
+async def test_get_receipts_for_transaction_unreceipted_is_empty(mock_client):
+    # An unreceipted transaction returns only UNRELATED orphans → tool yields [].
+    mock_client.get_receipts_for_transaction.return_value = {
+        "receipts": [{"_id": "orphan", "pairingStatus": "UNRELATED"}]
+    }
+    result = await get_receipts_for_transaction("tx-123")
+    assert result["receipts"] == []
+
+
 async def test_upload_receipt(mock_client, tmp_path):
     receipt = tmp_path / "invoice.pdf"
     receipt.write_bytes(b"%PDF-1.4 fake")

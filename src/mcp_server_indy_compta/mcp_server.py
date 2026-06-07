@@ -67,7 +67,9 @@ async def get_transaction_filters() -> dict[str, Any]:
         "Use get_transaction_filters to discover valid filter values. "
         "Parameters: page (1-based), search (free text), account_or_from (bank account filter), "
         "start_date / end_date (ISO 8601 date strings, e.g. '2024-01-01'), "
-        "transaction_type (income / expense / transfer — check get_transaction_filters for exact values)."
+        "transaction_type (entry-method filter: 'caisse' / 'manuel' / 'divers' from "
+        "get_transaction_filters — there is NO income/expense type; split those by the sign "
+        "of amountInCents: negative = expense, positive = income/refund)."
     ),
 )
 async def list_transactions(
@@ -123,10 +125,23 @@ async def list_pending_transactions() -> dict[str, Any]:
 
 @mcp.tool(
     name="get_receipts_for_transaction",
-    description="Return all receipt or invoice documents already attached to a given transaction.",
+    description=(
+        "Return the receipt/invoice documents ATTACHED to a given transaction. "
+        "The underlying Indy endpoint also returns the account-wide pool of unattached "
+        "receipts (pairingStatus 'UNRELATED'); this tool filters those out and returns "
+        "only the attached ones (pairingStatus 'PAIRED'), so an empty 'receipts' list means "
+        "the transaction has no receipt. (A transaction object's own 'receipts'/'receiptIds' "
+        "field lists the same attachments — prefer it when you already have the transaction.)"
+    ),
 )
 async def get_receipts_for_transaction(transaction_id: str) -> dict[str, Any]:
-    return await _client().get_receipts_for_transaction(transaction_id)
+    result = await _client().get_receipts_for_transaction(transaction_id)
+    attached = [
+        receipt
+        for receipt in result.get("receipts", [])
+        if receipt.get("pairingStatus") == "PAIRED"
+    ]
+    return {**result, "receipts": attached}
 
 
 @mcp.tool(
@@ -321,8 +336,9 @@ def monthly_expense_summary(year: int, month: int) -> list[Message]:
         Message(
             f"Please produce a monthly expense summary for {year}-{month:02d}.\n\n"
             f"Steps:\n"
-            f"1. Call `list_all_transactions` with transaction_type='expense', "
-            f"start_date='{start}', end_date='{end}'.\n"
+            f"1. Call `list_all_transactions` with start_date='{start}', "
+            f"end_date='{end}' (do NOT pass transaction_type — there is no expense "
+            f"type). Keep only expenses: transactions with a negative `amountInCents`.\n"
             f"2. Group the results by category.\n"
             f"3. Calculate the total amount per category and an overall total.\n"
             f"4. Present the report as a markdown table with columns: "
@@ -388,10 +404,11 @@ def cash_flow_analysis(start_date: str, end_date: str) -> list[Message]:
         Message(
             f"Please analyse cash flow for the period {start_date} to {end_date}.\n\n"
             f"Steps:\n"
-            f"1. Call `list_all_transactions` with transaction_type='income', "
-            f"start_date='{start_date}', end_date='{end_date}' → sum all amounts for total income.\n"
-            f"2. Call `list_all_transactions` with transaction_type='expense', "
-            f"start_date='{start_date}', end_date='{end_date}' → sum all amounts for total expenses.\n"
+            f"1. Call `list_all_transactions` with start_date='{start_date}', "
+            f"end_date='{end_date}' (one call returns both directions — there is no "
+            f"income/expense transaction_type).\n"
+            f"2. Split by the sign of `amountInCents`: positive = income, negative = "
+            f"expense. Sum income as-is and expenses as absolute values.\n"
             f"3. Also call `list_pending_transactions` to show upcoming cash movements.\n"
             f"4. Present a summary:\n"
             f"   - Total income (€)\n"
@@ -422,10 +439,15 @@ def unreceipted_transactions(start_date: str, end_date: str) -> list[Message]:
             f"Please find all expense transactions between {start_date} and {end_date} "
             f"that have no receipt or invoice attached.\n\n"
             f"Steps:\n"
-            f"1. Call `list_all_transactions` with transaction_type='expense', "
-            f"start_date='{start_date}', end_date='{end_date}'.\n"
-            f"2. For each transaction, call `get_receipts_for_transaction` with its ID.\n"
-            f"3. Collect all transactions where the receipts list is empty.\n"
+            f"1. Call `list_all_transactions` with start_date='{start_date}', "
+            f"end_date='{end_date}' (no transaction_type). Keep only expenses: "
+            f"transactions with a negative `amountInCents`.\n"
+            f"2. A transaction is missing its justificatif when its own `receipts` "
+            f"array is empty — read that field directly. Do NOT call "
+            f"`get_receipts_for_transaction` per transaction just to check presence: "
+            f"that endpoint also returns the account-wide pool of unattached receipts, "
+            f"so its raw list is never empty.\n"
+            f"3. Collect all transactions whose `receipts` array is empty.\n"
             f"4. Present the results as a markdown table: "
             f"Date | Description | Amount (€) | Category.\n"
             f"5. State the total number and combined value of transactions missing receipts.\n"

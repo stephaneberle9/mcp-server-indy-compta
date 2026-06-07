@@ -93,7 +93,7 @@ Override the token cache location with `INDY_TOKEN_CACHE_PATH`.
 | `list_transactions` | Return a paginated list of transactions (30 per page) with optional filters. |
 | `list_all_transactions` | Fetch all transactions across all pages as a flat list. Use with care — may return large amounts of data. |
 | `list_pending_transactions` | Return pending and upcoming (not yet booked) transactions. |
-| `get_receipts_for_transaction` | Return all receipts or invoice documents attached to a given transaction. |
+| `get_receipts_for_transaction` | Return the receipt/invoice documents **attached** to a transaction (filtered to `pairingStatus: "PAIRED"`; the account-wide pool of unattached receipts is excluded). |
 | `get_client_suggestions` | Return the full unfiltered list of billing clients. |
 | `list_clients` | Search billing clients with pagination. |
 | `list_products` | Return all saved products and services from the product library. |
