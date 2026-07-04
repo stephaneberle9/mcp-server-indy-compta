@@ -189,7 +189,7 @@ async def test_create_invoice_draft(mock_client):
     result = await create_invoice_draft(
         title="Invoice #1",
         client_id="c1",
-        products=[{"name": "Consulting", "unit_price_cents": 10000}],
+        products=[{"name": "Consulting", "unitPriceHTInCents": 10000}],
     )
     assert result == {"id": "draft-1"}
     mock_client.create_invoice_draft.assert_called_once()

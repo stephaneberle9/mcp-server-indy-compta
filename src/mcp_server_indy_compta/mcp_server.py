@@ -276,7 +276,9 @@ async def list_invoices(
     description=(
         "Create a new invoice draft in Indy.fr. "
         "Parameters: title (invoice title), client_id (use list_clients to look up), "
-        "products (list of line items — each dict with at minimum 'name' and 'unit_price_cents'), "
+        "products (list of line items — each a dict with 'name' and 'unitPriceHTInCents' "
+        "(int, euro-cents), plus optional 'vatRate' (float 0–1), 'quantity' (float), "
+        "'type' ('SERVICE'/'PRODUCT'), 'unit' (e.g. 'day') and 'description'), "
         "iban / bic (optional payment details), payment_delay_days (default 0), "
         "payment_delay_reference ('ON_RECEIPT' or 'END_OF_MONTH' etc.), "
         "introduction_text / other_payment_conditions (optional free-text fields)."
@@ -379,7 +381,7 @@ def create_invoice_workflow(
             f"3. Call `create_invoice_draft` with:\n"
             f"   - title: an appropriate invoice title\n"
             f"   - client_id: the ID from step 1\n"
-            f"   - products: [{{'name': '{service_description}', 'unit_price_cents': {amount_cents}}}]\n"
+            f"   - products: [{{'name': '{service_description}', 'unitPriceHTInCents': {amount_cents}}}]\n"
             f"4. Confirm the draft was created and show me the draft ID and any next steps "
             f"to finalise and send it."
         )
