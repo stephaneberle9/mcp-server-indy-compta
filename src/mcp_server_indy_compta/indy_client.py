@@ -30,7 +30,7 @@ class IndyClientProvider:
         "microsoft-edge": Browser.EDGE,
         "chromium": Browser.CHROMIUM,
     }
-    _DEFAULT_BROWSER = Browser.CHROME
+    _DEFAULT_BROWSER = Browser.EDGE
 
     def __init__(self):
         self._client: IndyClient | None = None
@@ -51,7 +51,7 @@ class IndyClientProvider:
 
         Controlled by the ``INDY_BROWSER`` environment variable, accepting
         ``chrome``, ``edge``, or ``chromium`` (case-insensitive; aliases such
-        as ``msedge`` are also accepted). Defaults to Chrome when unset. An
+        as ``msedge`` are also accepted). Defaults to Edge when unset. An
         unrecognized value logs a warning and falls back to the default rather
         than failing the server.
         """
