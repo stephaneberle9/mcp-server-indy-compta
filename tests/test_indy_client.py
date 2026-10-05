@@ -10,9 +10,9 @@ from mcp_server_indy_compta.indy_client import IndyClientProvider
 ENV_VAR = IndyClientProvider.INDY_BROWSER_ENV_VAR_NAME
 
 
-def test_defaults_to_chrome_when_unset(monkeypatch):
+def test_defaults_to_edge_when_unset(monkeypatch):
     monkeypatch.delenv(ENV_VAR, raising=False)
-    assert IndyClientProvider._resolve_browser() is Browser.CHROME
+    assert IndyClientProvider._resolve_browser() is Browser.EDGE
 
 
 @pytest.mark.parametrize(
@@ -42,9 +42,9 @@ def test_values_are_case_insensitive_and_trimmed(monkeypatch, value):
     )
 
 
-def test_unknown_value_falls_back_to_chrome_with_warning(monkeypatch, caplog):
+def test_unknown_value_falls_back_to_edge_with_warning(monkeypatch, caplog):
     monkeypatch.setenv(ENV_VAR, "safari")
     with caplog.at_level(logging.WARNING):
-        assert IndyClientProvider._resolve_browser() is Browser.CHROME
+        assert IndyClientProvider._resolve_browser() is Browser.EDGE
     assert ENV_VAR in caplog.text
     assert "safari" in caplog.text
