@@ -3,6 +3,7 @@
 - [Development Setup](#development-setup)
   - [Prerequisites](#prerequisites)
   - [Initial Setup](#initial-setup)
+  - [Picking up python-indy-compta changes](#picking-up-python-indy-compta-changes)
 - [Running the Server](#running-the-server)
   - [Inside dev environment](#inside-dev-environment)
   - [Outside dev environment](#outside-dev-environment)
@@ -40,6 +41,18 @@ Copy the environment template and configure your credentials:
 cp .env.example .env   # Linux/macOS
 copy .env.example .env  # Windows
 ```
+
+### Picking up python-indy-compta changes
+
+`uv.lock` pins python-indy-compta to a commit, so changes pushed to it do not reach
+this server on their own. To move to the latest commit on its `main`, run:
+
+```bash
+uv lock --upgrade-package indy-compta
+uv sync
+```
+
+Then run the tests and commit the updated `uv.lock`.
 
 ## Running the Server
 
