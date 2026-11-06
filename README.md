@@ -30,10 +30,9 @@ A [Model Context Protocol](https://modelcontextprotocol.com) (MCP) server that e
 
 ### Quick Start
 
-This server depends on [fastmcp-creds](https://github.com/stephaneberle9/fastmcp-creds) and [python-indy-compta](https://github.com/stephaneberle9/python-indy-compta) as local editable packages. Clone all repositories side by side:
+This server depends on [python-indy-compta](https://github.com/stephaneberle9/python-indy-compta) as a local editable package; clone both repositories side by side. [fastmcp-creds](https://github.com/stephaneberle9/fastmcp-creds) comes from PyPI.
 
 ```bash
-git clone https://github.com/stephaneberle9/fastmcp-creds.git
 git clone https://github.com/stephaneberle9/python-indy-compta.git
 git clone https://github.com/stephaneberle9/mcp-server-indy-compta.git
 cd mcp-server-indy-compta

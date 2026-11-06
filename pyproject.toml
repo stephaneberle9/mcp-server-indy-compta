@@ -8,7 +8,7 @@ authors = [
 requires-python = ">=3.12"
 dependencies = [
     "fastmcp>=4.0.8,<5",
-    "fastmcp-creds[keyring]",
+    "fastmcp-creds[keyring]>=0.1.0",
     "indy-compta[browser-login]",
 ]
 
@@ -56,7 +56,6 @@ exclude = [
 default-groups = ["dev", "test"]
 
 [tool.uv.sources]
-fastmcp-creds = { path = "../fastmcp-creds", editable = true }
 indy-compta = { path = "../python-indy-compta", editable = true }
 
 [tool.deptry]

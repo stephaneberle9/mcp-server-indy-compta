@@ -274,8 +274,12 @@ wheels = [
 
 [[package]]
 name = "credchain"
-version = "0.0.0.post1.dev0+1371fb2"
-source = { git = "https://github.com/stephaneberle9/python-credchain.git?branch=main#1371fb2e2c2b4ce5df31346f3bc9043221d035df" }
+version = "0.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/c2/9b/d1cc392f574f202c5e2bf192894aa6d698b430c3d732af040a5ef525023f/credchain-0.1.0.tar.gz", hash = "sha256:194ea997f5b936b5d4a62dde4669147ea2bf61c5c1ce3ef99445bb0ba9296cf9", size = 72508, upload-time = "2026-11-06T04:42:57.559Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/18/69/19fa92a94ac7c2a25d8b75ac23280e50f71d1de69661121febef31a06673/credchain-0.1.0-py3-none-any.whl", hash = "sha256:7525cc0e4f5d2ad875de593b52b04c9bcfce838b64fdff9bbef93fdff710a7c6", size = 8543, upload-time = "2026-11-06T04:42:56.435Z" },
+]
 
 [package.optional-dependencies]
 keyring = [
@@ -425,36 +429,20 @@ wheels = [
 
 [[package]]
 name = "fastmcp-creds"
-source = { editable = "../fastmcp-creds" }
+version = "0.1.0"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "credchain" },
     { name = "fastmcp" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f8/64/702bf4e54ae6d07fe7f9ac121d421bcb731e7adbec1896b3ab63c31a010d/fastmcp_creds-0.1.0.tar.gz", hash = "sha256:7ce5d90e220a09260fc22e42267a2dea3660f367a68d909df730691ad99c7987", size = 146663, upload-time = "2026-11-06T04:58:44.222Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/49/1c/6f8ea21fb6347a386ab95c9d01a35ac12df455795d0ceb93b16e53cef449/fastmcp_creds-0.1.0-py3-none-any.whl", hash = "sha256:baf9b5585b566711d5609b5407e512c9b04151485ac8dfc9ef7142930c654614", size = 9316, upload-time = "2026-11-06T04:58:43.155Z" },
 ]
 
 [package.optional-dependencies]
 keyring = [
     { name = "credchain", extra = ["keyring"] },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "credchain", git = "https://github.com/stephaneberle9/python-credchain.git?branch=main" },
-    { name = "credchain", extras = ["keyring"], marker = "extra == 'keyring'", git = "https://github.com/stephaneberle9/python-credchain.git?branch=main" },
-    { name = "fastmcp", specifier = ">=4.0.0,<5" },
-]
-provides-extras = ["keyring"]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "pre-commit", specifier = ">=4.3.0" },
-    { name = "ruff", specifier = ">=0.15,<0.16" },
-    { name = "ty" },
-]
-test = [
-    { name = "keyring", specifier = ">=25.0.0" },
-    { name = "pytest", specifier = ">=7.0.0" },
-    { name = "pytest-cov", specifier = ">=4.0.0" },
-    { name = "pytest-mock", specifier = ">=3.10.0" },
 ]
 
 [[package]]
@@ -880,7 +868,7 @@ test = [
 [package.metadata]
 requires-dist = [
     { name = "fastmcp", specifier = ">=4.0.8,<5" },
-    { name = "fastmcp-creds", extras = ["keyring"], editable = "../fastmcp-creds" },
+    { name = "fastmcp-creds", extras = ["keyring"], specifier = ">=0.1.0" },
     { name = "indy-compta", extras = ["browser-login"], editable = "../python-indy-compta" },
 ]
 

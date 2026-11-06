@@ -26,12 +26,11 @@
 ### Initial Setup
 
 > [!IMPORTANT]
-> This server depends on [fastmcp-creds](https://github.com/stephaneberle9/fastmcp-creds) and
-> [python-indy-compta](https://github.com/stephaneberle9/python-indy-compta) as local editable
-> packages. Both repos must be cloned side by side before running `uv sync`.
+> This server depends on [python-indy-compta](https://github.com/stephaneberle9/python-indy-compta) as a local
+> editable package. Both repos must be cloned side by side before running
+> `uv sync`. [fastmcp-creds](https://github.com/stephaneberle9/fastmcp-creds) comes from PyPI.
 
 ```bash
-git clone https://github.com/stephaneberle9/fastmcp-creds.git
 git clone https://github.com/stephaneberle9/python-indy-compta.git
 git clone https://github.com/stephaneberle9/mcp-server-indy-compta.git
 cd mcp-server-indy-compta
@@ -42,7 +41,6 @@ The expected directory layout:
 
 ```text
 W:\GitHub\
-├── fastmcp-creds\                ← credential management library (editable dependency)
 ├── mcp-server-indy-compta\       ← this repo
 └── python-indy-compta\           ← Indy.fr client library (editable dependency)
 ```
