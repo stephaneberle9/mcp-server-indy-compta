@@ -26,23 +26,12 @@
 ### Initial Setup
 
 > [!IMPORTANT]
-> This server depends on [python-indy-compta](https://github.com/stephaneberle9/python-indy-compta) as a local
-> editable package. Both repos must be cloned side by side before running
-> `uv sync`. [fastmcp-creds](https://github.com/stephaneberle9/fastmcp-creds) comes from PyPI.
+> `uv sync` installs [python-indy-compta](https://github.com/stephaneberle9/python-indy-compta) from its private GitHub repository, pinned to the commit in `uv.lock`, so your git needs read access to it; [fastmcp-creds](https://github.com/stephaneberle9/fastmcp-creds) comes from PyPI.
 
 ```bash
-git clone https://github.com/stephaneberle9/python-indy-compta.git
 git clone https://github.com/stephaneberle9/mcp-server-indy-compta.git
 cd mcp-server-indy-compta
 uv sync
-```
-
-The expected directory layout:
-
-```text
-W:\GitHub\
-├── mcp-server-indy-compta\       ← this repo
-└── python-indy-compta\           ← Indy.fr client library (editable dependency)
 ```
 
 Copy the environment template and configure your credentials:

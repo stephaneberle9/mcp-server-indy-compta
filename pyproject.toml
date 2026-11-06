@@ -56,7 +56,7 @@ exclude = [
 default-groups = ["dev", "test"]
 
 [tool.uv.sources]
-indy-compta = { path = "../python-indy-compta", editable = true }
+indy-compta = { git = "https://github.com/stephaneberle9/python-indy-compta.git", branch = "main" }
 
 [tool.deptry]
 exclude = [

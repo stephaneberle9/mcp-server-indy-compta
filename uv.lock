@@ -642,7 +642,8 @@ wheels = [
 
 [[package]]
 name = "indy-compta"
-source = { editable = "../python-indy-compta" }
+version = "0.0.0.post15.dev0+bb23dc0"
+source = { git = "https://github.com/stephaneberle9/python-indy-compta.git?branch=main#bb23dc038bef071d03bc1153f75baf96cc53e4e5" }
 dependencies = [
     { name = "httpx2" },
 ]
@@ -650,29 +651,6 @@ dependencies = [
 [package.optional-dependencies]
 browser-login = [
     { name = "playwright" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "httpx2", specifier = ">=2.13" },
-    { name = "playwright", marker = "extra == 'browser-login'", specifier = ">=1.40.0" },
-]
-provides-extras = ["browser-login"]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "playwright", specifier = ">=1.59.0" },
-    { name = "pre-commit", specifier = ">=4.3.0" },
-    { name = "python-dotenv", specifier = ">=1.0.0" },
-    { name = "ruff" },
-    { name = "ty" },
-]
-test = [
-    { name = "pytest", specifier = ">=7.0.0" },
-    { name = "pytest-asyncio", specifier = ">=0.21.0" },
-    { name = "pytest-cov", specifier = ">=4.0.0" },
-    { name = "pytest-mock", specifier = ">=3.10.0" },
-    { name = "pytest-timeout", specifier = ">=2.0.0" },
 ]
 
 [[package]]
@@ -869,7 +847,7 @@ test = [
 requires-dist = [
     { name = "fastmcp", specifier = ">=4.0.8,<5" },
     { name = "fastmcp-creds", extras = ["keyring"], specifier = ">=0.1.0" },
-    { name = "indy-compta", extras = ["browser-login"], editable = "../python-indy-compta" },
+    { name = "indy-compta", extras = ["browser-login"], git = "https://github.com/stephaneberle9/python-indy-compta.git?branch=main" },
 ]
 
 [package.metadata.requires-dev]
